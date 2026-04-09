@@ -8,6 +8,7 @@ ISO 4217 currency formatting, parsing, and metadata library for .NET.
 - Format and parse currency amounts using ISO 4217 codes
 - `CurrencyInfo` metadata: symbol, decimal digits, English/native names
 - `Money` value type with arithmetic operators and type-safe currency enforcement
+- `Percent` value type for intuitive percentage calculations (`price * 8.5m.Percent()`)
 - `FormatOptions` for custom decimal digits, rounding, group separators
 - Extension methods: `decimal.FormatAsCurrency("USD")`
 - Custom `IFormatProvider` for `string.Format` integration
@@ -52,6 +53,12 @@ var price = new Money(100m, "USD");
 var tax = new Money(8.5m, "USD");
 var total = price + tax;           // Money(108.5, "USD")
 Console.WriteLine(total);          // "$108.50"
+
+// Percent type (type-safe percentage calculations)
+var tax = price * new Percent(8.5m);   // Money(8.5, "USD")
+var tax2 = price * 8.5m.Percent();     // same thing, extension method
+var tax3 = price.PercentOf(8.5m);      // same thing, fluent style
+var total = price + tax;               // Money(108.5, "USD")
 
 // Money prevents cross-currency errors at compile/runtime
 // new Money(100, "USD") + new Money(100, "EUR")  → throws InvalidOperationException

@@ -141,6 +141,78 @@ public class MoneyTests
     }
 }
 
+public class PercentTests
+{
+    [Fact]
+    public void Constructor_NormalizesRate()
+    {
+        var pct = new Percent(8.5m);
+        Assert.Equal(8.5m, pct.Value);
+        Assert.Equal(0.085m, pct.Rate);
+    }
+
+    [Fact]
+    public void Money_MultiplyByPercent_Works()
+    {
+        var price = new Money(100m, "USD");
+        var tax = price * new Percent(8.5m);
+        Assert.Equal(8.5m, tax.Amount);
+        Assert.Equal("USD", tax.IsoCode);
+    }
+
+    [Fact]
+    public void Percent_MultiplyByMoney_Works()
+    {
+        var price = new Money(200m, "USD");
+        var tax = new Percent(10m) * price;
+        Assert.Equal(20m, tax.Amount);
+    }
+
+    [Fact]
+    public void Money_PercentOf_ExtensionMethod_Works()
+    {
+        var price = new Money(100m, "USD");
+        var tax = price.PercentOf(8.5m);
+        Assert.Equal(8.5m, tax.Amount);
+    }
+
+    [Fact]
+    public void Decimal_Percent_ExtensionMethod_Works()
+    {
+        var price = new Money(100m, "USD");
+        var tax = price * 8.5m.Percent();
+        Assert.Equal(8.5m, tax.Amount);
+    }
+
+    [Fact]
+    public void Percent_Addition_Works()
+    {
+        var a = new Percent(5m);
+        var b = new Percent(3m);
+        Assert.Equal(new Percent(8m), a + b);
+    }
+
+    [Fact]
+    public void Percent_Subtraction_Works()
+    {
+        var result = new Percent(10m) - new Percent(3m);
+        Assert.Equal(new Percent(7m), result);
+    }
+
+    [Fact]
+    public void Percent_Equality_Works()
+    {
+        Assert.True(new Percent(8.5m) == new Percent(8.5m));
+        Assert.False(new Percent(8.5m) != new Percent(8.5m));
+    }
+
+    [Fact]
+    public void Percent_ToString_ShowsPercent()
+    {
+        Assert.Equal("8.5%", new Percent(8.5m).ToString());
+    }
+}
+
 public class DecimalExtensionsTests
 {
     [Fact]

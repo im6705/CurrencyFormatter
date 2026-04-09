@@ -56,6 +56,14 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     public static Money operator /(Money money, decimal divisor)
         => new Money(money.Amount / divisor, money.IsoCode);
 
+    /// <summary>금액에 퍼센트를 적용합니다.</summary>
+    public static Money operator *(Money money, Percent pct)
+        => new Money(money.Amount * pct.Rate, money.IsoCode);
+
+    /// <summary>금액에 퍼센트를 적용합니다.</summary>
+    public static Money operator *(Percent pct, Money money)
+        => money * pct;
+
     /// <summary>부호 반전.</summary>
     public static Money operator -(Money money)
         => new Money(-money.Amount, money.IsoCode);
