@@ -10,7 +10,7 @@ namespace CurrencyFormatter;
 /// <summary>
 /// ISO 4217 통화 포맷팅 및 파싱을 제공하는 정적 파사드 클래스.
 /// </summary>
-public static class CurrencyFormatter
+public static class Currency
 {
     private static readonly CurrencyRegistry Registry = CurrencyRegistry.Default;
 

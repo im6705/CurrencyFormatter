@@ -32,19 +32,19 @@ using CurrencyFormatter.Extensions;
 using CurrencyFormatter.Models;
 
 // Basic formatting
-CurrencyFormatter.Format(1234.56m, "USD");   // "$1,234.56"
-CurrencyFormatter.Format(1234m, "KRW");      // "₩1,234"
-CurrencyFormatter.Format(1234.56m, "EUR");   // "1.234,56 €"
+Currency.Format(1234.56m, "USD");   // "$1,234.56"
+Currency.Format(1234m, "KRW");      // "₩1,234"
+Currency.Format(1234.56m, "EUR");   // "1.234,56 €"
 
 // Parsing
-decimal amount = CurrencyFormatter.Parse("$1,234.56", "USD");  // 1234.56
+decimal amount = Currency.Parse("$1,234.56", "USD");  // 1234.56
 
 // Safe parsing
-if (CurrencyFormatter.TryParse("$100", "USD", out var result))
+if (Currency.TryParse("$100", "USD", out var result))
     Console.WriteLine(result);  // 100
 
 // Currency metadata
-var info = CurrencyFormatter.GetInfo("USD");
+var info = Currency.GetInfo("USD");
 Console.WriteLine(info.Symbol);         // "$"
 Console.WriteLine(info.DecimalDigits);  // 2
 Console.WriteLine(info.EnglishName);    // "US Dollar"
@@ -68,9 +68,9 @@ var total = price + tax;               // Money(108.5, "USD")
 // new Money(100, "USD") + new Money(100, "EUR")  → throws InvalidOperationException
 
 // Compact formatting
-CurrencyFormatter.FormatCompact(1500000m, "USD");     // "$1.5M"
-CurrencyFormatter.FormatCompact(2500m, "USD");        // "$2.5K"
-CurrencyFormatter.FormatCompact(3000000000m, "USD");  // "$3.0B"
+Currency.FormatCompact(1500000m, "USD");     // "$1.5M"
+Currency.FormatCompact(2500m, "USD");        // "$2.5K"
+Currency.FormatCompact(3000000000m, "USD");  // "$3.0B"
 
 // IFormattable (format strings)
 var revenue = new Money(1500000m, "USD");
@@ -94,7 +94,7 @@ var options = new FormatOptions(
     rounding: MidpointRounding.AwayFromZero,
     useGroupSeparator: true,
     includeSymbol: true);
-CurrencyFormatter.Format(1234.5678m, "USD", options);  // "$1,234.5678"
+Currency.Format(1234.5678m, "USD", options);  // "$1,234.5678"
 
 // IFormatProvider integration
 var provider = new CurrencyFormatProvider("USD");
@@ -113,10 +113,10 @@ var registry = CurrencyRegistry.Default.WithCurrency(custom);
 ## Supported Currencies
 
 ```csharp
-foreach (var code in CurrencyFormatter.SupportedCodes)
+foreach (var code in Currency.SupportedCodes)
     Console.WriteLine(code);
 
-foreach (var currency in CurrencyFormatter.SupportedCurrencies)
+foreach (var currency in Currency.SupportedCurrencies)
     Console.WriteLine($"{currency.IsoCode} ({currency.Symbol}) - {currency.EnglishName}");
 ```
 

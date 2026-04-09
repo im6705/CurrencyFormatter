@@ -25,13 +25,13 @@ public static class DecimalExtensions
     /// <param name="amount">포맷할 금액</param>
     /// <param name="isoCode">ISO 4217 통화 코드</param>
     public static string FormatAsCurrency(this decimal amount, string isoCode)
-        => CurrencyFormatter.Format(amount, isoCode);
+        => Currency.Format(amount, isoCode);
 
     /// <summary>
     /// 금액을 통화 형식 문자열로 포맷합니다 (옵션 지정).
     /// </summary>
     public static string FormatAsCurrency(this decimal amount, string isoCode, FormatOptions options)
-        => CurrencyFormatter.Format(amount, isoCode, options);
+        => Currency.Format(amount, isoCode, options);
 
     /// <summary>
     /// 금액을 Money 구조체로 변환합니다.

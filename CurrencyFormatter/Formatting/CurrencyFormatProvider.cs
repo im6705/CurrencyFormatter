@@ -38,13 +38,13 @@ public sealed class CurrencyFormatProvider : IFormatProvider, ICustomFormatter
     public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
         if (arg is decimal d)
-            return CurrencyFormatter.Format(d, _isoCode);
+            return Currency.Format(d, _isoCode);
         if (arg is double dbl)
-            return CurrencyFormatter.Format((decimal)dbl, _isoCode);
+            return Currency.Format((decimal)dbl, _isoCode);
         if (arg is int i)
-            return CurrencyFormatter.Format(i, _isoCode);
+            return Currency.Format(i, _isoCode);
         if (arg is long l)
-            return CurrencyFormatter.Format(l, _isoCode);
+            return Currency.Format(l, _isoCode);
 
         // 숫자가 아닌 경우 기본 포맷
         if (arg is IFormattable formattable)

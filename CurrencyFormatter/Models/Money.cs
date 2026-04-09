@@ -30,8 +30,8 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattab
     /// <summary>통화 형식 문자열로 포맷합니다.</summary>
     public string Format(FormatOptions? options = null)
         => options != null
-            ? CurrencyFormatter.Format(Amount, IsoCode, options)
-            : CurrencyFormatter.Format(Amount, IsoCode);
+            ? Currency.Format(Amount, IsoCode, options)
+            : Currency.Format(Amount, IsoCode);
 
     /// <summary>같은 통화의 금액을 더합니다.</summary>
     public static Money operator +(Money left, Money right)
@@ -108,7 +108,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattab
         if (format == "N")
             return Format(new FormatOptions(includeSymbol: false));
         if (format == "K")
-            return CurrencyFormatter.FormatCompact(Amount, IsoCode);
+            return Currency.FormatCompact(Amount, IsoCode);
         return Format();
     }
 #pragma warning restore CS1591
@@ -119,7 +119,7 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattab
     /// <param name="rounding">반올림 모드 (기본: Banker's rounding)</param>
     public Money Round(MidpointRounding rounding = MidpointRounding.ToEven)
     {
-        var info = CurrencyFormatter.GetInfo(IsoCode);
+        var info = Currency.GetInfo(IsoCode);
         return new Money(Math.Round(Amount, info.DecimalDigits, rounding), IsoCode);
     }
 
@@ -131,12 +131,12 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattab
 
     /// <summary>통화 문자열을 파싱하여 Money를 생성합니다.</summary>
     public static Money Parse(string input, string isoCode)
-        => new Money(CurrencyFormatter.Parse(input, isoCode), isoCode);
+        => new Money(Currency.Parse(input, isoCode), isoCode);
 
     /// <summary>통화 문자열 파싱을 시도합니다.</summary>
     public static bool TryParse(string input, string isoCode, out Money result)
     {
-        if (CurrencyFormatter.TryParse(input, isoCode, out var amount))
+        if (Currency.TryParse(input, isoCode, out var amount))
         {
             result = new Money(amount, isoCode);
             return true;

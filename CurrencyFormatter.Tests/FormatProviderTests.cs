@@ -65,7 +65,7 @@ public class SpanTryParseTests
     public void TryParse_Span_ValidInput_ReturnsTrueAndValue()
     {
         ReadOnlySpan<char> input = "$1,234.56".AsSpan();
-        var success = CurrencyFormatter.TryParse(input, "USD", out var result);
+        var success = Currency.TryParse(input, "USD", out var result);
         Assert.True(success);
         Assert.Equal(1234.56m, result);
     }
@@ -74,7 +74,7 @@ public class SpanTryParseTests
     public void TryParse_Span_InvalidInput_ReturnsFalse()
     {
         ReadOnlySpan<char> input = "not_a_number".AsSpan();
-        var success = CurrencyFormatter.TryParse(input, "USD", out var result);
+        var success = Currency.TryParse(input, "USD", out var result);
         Assert.False(success);
         Assert.Equal(0m, result);
     }
@@ -83,7 +83,7 @@ public class SpanTryParseTests
     public void TryParse_Span_UnsupportedCode_ReturnsFalse()
     {
         ReadOnlySpan<char> input = "$100".AsSpan();
-        var success = CurrencyFormatter.TryParse(input, "XYZ", out var result);
+        var success = Currency.TryParse(input, "XYZ", out var result);
         Assert.False(success);
     }
 #endif

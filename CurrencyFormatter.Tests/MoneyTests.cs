@@ -295,49 +295,49 @@ public class CompactFormatTests
     [Fact]
     public void FormatCompact_Thousands()
     {
-        Assert.Equal("$1.2K", CurrencyFormatter.FormatCompact(1234m, "USD"));
+        Assert.Equal("$1.2K", Currency.FormatCompact(1234m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_Millions()
     {
-        Assert.Equal("$1.5M", CurrencyFormatter.FormatCompact(1500000m, "USD"));
+        Assert.Equal("$1.5M", Currency.FormatCompact(1500000m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_Billions()
     {
-        Assert.Equal("$2.0B", CurrencyFormatter.FormatCompact(2000000000m, "USD"));
+        Assert.Equal("$2.0B", Currency.FormatCompact(2000000000m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_Trillions()
     {
-        Assert.Equal("$1.0T", CurrencyFormatter.FormatCompact(1000000000000m, "USD"));
+        Assert.Equal("$1.0T", Currency.FormatCompact(1000000000000m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_BelowThousand_ReturnsNormalFormat()
     {
-        Assert.Equal("$999.00", CurrencyFormatter.FormatCompact(999m, "USD"));
+        Assert.Equal("$999.00", Currency.FormatCompact(999m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_Negative()
     {
-        Assert.Equal("$-1.5M", CurrencyFormatter.FormatCompact(-1500000m, "USD"));
+        Assert.Equal("$-1.5M", Currency.FormatCompact(-1500000m, "USD"));
     }
 
     [Fact]
     public void FormatCompact_CustomDecimals()
     {
-        Assert.Equal("$1.23M", CurrencyFormatter.FormatCompact(1234567m, "USD", 2));
+        Assert.Equal("$1.23M", Currency.FormatCompact(1234567m, "USD", 2));
     }
 
     [Fact]
     public void FormatCompact_KRW()
     {
-        Assert.Equal("₩1.5M", CurrencyFormatter.FormatCompact(1500000m, "KRW"));
+        Assert.Equal("₩1.5M", Currency.FormatCompact(1500000m, "KRW"));
     }
 }
 
