@@ -59,24 +59,24 @@ var total = price + tax;           // Money(108.5, "USD")
 Console.WriteLine(total);          // "$108.50"
 
 // Percent type (type-safe percentage calculations)
-var tax = price * new Percent(8.5m);   // Money(8.5, "USD")
-var tax2 = price * 8.5m.Percent();     // same thing, extension method
-var tax3 = price.PercentOf(8.5m);      // same thing, fluent style
-var total = price + tax;               // Money(108.5, "USD")
+var pctTax = price * new Percent(8.5m);   // Money(8.5, "USD")
+var pctTax2 = price * 8.5m.Percent();     // same thing, extension method
+var pctTax3 = price.PercentOf(8.5m);      // same thing, fluent style
+var totalWithTax = price + pctTax;         // Money(108.5, "USD")
 
 // Money prevents cross-currency errors at compile/runtime
 // new Money(100, "USD") + new Money(100, "EUR")  → throws InvalidOperationException
 
 // Compact formatting
-Currency.FormatCompact(1500000m, "USD");     // "$1.5M"
-Currency.FormatCompact(2500m, "USD");        // "$2.5K"
-Currency.FormatCompact(3000000000m, "USD");  // "$3.0B"
+var compact1 = Currency.FormatCompact(1500000m, "USD");     // "$1.5M"
+var compact2 = Currency.FormatCompact(2500m, "USD");        // "$2.5K"
+var compact3 = Currency.FormatCompact(3000000000m, "USD");  // "$3.0B"
 
 // IFormattable (format strings)
 var revenue = new Money(1500000m, "USD");
-$"{revenue:K}";  // "$1.5M"  (compact)
-$"{revenue:N}";  // "1,500,000.00" (number only)
-$"{revenue:C}";  // "$1,500,000.00" (currency, default)
+Console.WriteLine($"{revenue:K}");  // "$1.5M"  (compact)
+Console.WriteLine($"{revenue:N}");  // "1,500,000.00" (number only)
+Console.WriteLine($"{revenue:C}");  // "$1,500,000.00" (currency, default)
 
 // Rounding (currency-aware)
 var calculated = new Money(10.555m, "USD");
