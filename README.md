@@ -27,8 +27,10 @@ dotnet add package CurrencyFormatter
 ## Quick Start
 
 ```csharp
+using System.Text.Json;
 using CurrencyFormatter;
 using CurrencyFormatter.Extensions;
+using CurrencyFormatter.Formatting;
 using CurrencyFormatter.Models;
 
 // Basic formatting
@@ -63,6 +65,7 @@ var pctTax = price * new Percent(8.5m);   // Money(8.5, "USD")
 var pctTax2 = price * 8.5m.Percent();     // same thing, extension method
 var pctTax3 = price.PercentOf(8.5m);      // same thing, fluent style
 var totalWithTax = price + pctTax;         // Money(108.5, "USD")
+Console.WriteLine($"Total(Tax inc.) {totalWithTax}");
 
 // Money prevents cross-currency errors at compile/runtime
 // new Money(100, "USD") + new Money(100, "EUR")  → throws InvalidOperationException
