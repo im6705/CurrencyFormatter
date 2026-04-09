@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CurrencyFormatter.Tests/CurrencyFormatter.Tests.csproj" />
+  <Project Path="CurrencyFormatter/CurrencyFormatter.csproj" />
+</Solution>
