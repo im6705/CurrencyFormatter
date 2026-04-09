@@ -8,6 +8,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>currency;formatting;iso4217;money;parsing</PackageTags>
+        <RepositoryUrl>https://github.com/im6705/CurrencyFormatter.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
