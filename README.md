@@ -1,5 +1,5 @@
 # CurrencyFormatter
-
+[![Build and Publish](https://github.com/im6705/CurrencyFormatter/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/im6705/CurrencyFormatter/actions/workflows/build.yml)
 ISO 4217 currency formatting, parsing, and metadata library for .NET.
 
 ## Features
