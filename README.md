@@ -11,7 +11,9 @@ ISO 4217 currency formatting, parsing, and metadata library for .NET.
 - `Percent` value type for intuitive percentage calculations (`price * 8.5m.Percent()`)
 - Compact formatting: `$1.2K`, `$3.5M`, `$2.0B`
 - `Money.Round()` for currency-aware rounding
-- `IFormattable` support: `$"{price:K}"` for compact, `$"{price:N}"` for number-only
+- `IFormattable` support: `K` compact, `N` number, `I` ISO code, `A` accounting
+- `SymbolMode`: `$100` vs `100 USD` vs `100`
+- `NegativePattern`: `-$100` vs `($100)` accounting style
 - Built-in JSON serialization (`System.Text.Json`)
 - `FormatOptions` for custom decimal digits, rounding, group separators
 - Extension methods: `decimal.FormatAsCurrency("USD")`
@@ -80,6 +82,11 @@ var revenue = new Money(1500000m, "USD");
 Console.WriteLine($"{revenue:K}");  // "$1.5M"  (compact)
 Console.WriteLine($"{revenue:N}");  // "1,500,000.00" (number only)
 Console.WriteLine($"{revenue:C}");  // "$1,500,000.00" (currency, default)
+Console.WriteLine($"{revenue:I}");  // "1,500,000.00 USD" (ISO code)
+
+// Accounting style (negative in parentheses)
+var loss = new Money(-500m, "USD");
+Console.WriteLine($"{loss:A}");     // "($500.00)"
 
 // Rounding (currency-aware)
 var calculated = new Money(10.555m, "USD");
@@ -90,6 +97,14 @@ calculated.Round(MidpointRounding.AwayFromZero);     // $10.56
 // JSON serialization (System.Text.Json, built-in)
 var json = JsonSerializer.Serialize(price);   // {"amount":100,"currency":"USD"}
 var money = JsonSerializer.Deserialize<Money>(json);
+
+// SymbolMode (ISO code display)
+Currency.Format(100m, "USD", new FormatOptions(symbol: SymbolMode.IsoCode));
+// → "100.00 USD"
+
+// NegativePattern (accounting parentheses)
+Currency.Format(-100m, "USD", new FormatOptions(negativePattern: NegativePattern.Parentheses));
+// → "($100.00)"
 
 // Format options
 var options = new FormatOptions(

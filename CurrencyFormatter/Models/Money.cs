@@ -99,16 +99,21 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattab
 
     /// <summary>
     /// 형식 문자열을 사용하여 포맷합니다.
-    /// G/C: 통화 형식 ($1,234.56), N: 숫자만 (1,234.56), K: 축약 ($1.2K)
+    /// G/C: 통화 형식 ($1,234.56), N: 숫자만 (1,234.56), K: 축약 ($1.2K),
+    /// I: ISO 코드 (1,234.56 USD), A: 회계 스타일 (($1,234.56))
     /// </summary>
     public string ToString(string? format, IFormatProvider? formatProvider = null)
     {
         if (string.IsNullOrEmpty(format) || format == "G" || format == "C")
             return Format();
         if (format == "N")
-            return Format(new FormatOptions(includeSymbol: false));
+            return Format(new FormatOptions(symbol: SymbolMode.None));
         if (format == "K")
             return Currency.FormatCompact(Amount, IsoCode);
+        if (format == "I")
+            return Format(new FormatOptions(symbol: SymbolMode.IsoCode));
+        if (format == "A")
+            return Format(new FormatOptions(negativePattern: NegativePattern.Parentheses));
         return Format();
     }
 #pragma warning restore CS1591

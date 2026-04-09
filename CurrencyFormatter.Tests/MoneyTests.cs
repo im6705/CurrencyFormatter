@@ -288,6 +288,119 @@ public class FormattableTests
         var money = new Money(1234.56m, "USD");
         Assert.Equal("$1,234.56", money.ToString(null, null));
     }
+
+    [Fact]
+    public void ToString_I_ReturnsIsoCodeFormat()
+    {
+        var money = new Money(1234.56m, "USD");
+        Assert.Equal("1,234.56 USD", money.ToString("I"));
+    }
+
+    [Fact]
+    public void ToString_A_PositiveAmount_ReturnsNormal()
+    {
+        var money = new Money(100m, "USD");
+        Assert.Equal("$100.00", money.ToString("A"));
+    }
+
+    [Fact]
+    public void ToString_A_NegativeAmount_ReturnsParentheses()
+    {
+        var money = new Money(-100m, "USD");
+        Assert.Equal("($100.00)", money.ToString("A"));
+    }
+}
+
+public class SymbolModeTests
+{
+    [Fact]
+    public void SymbolMode_Symbol_ReturnsDefault()
+    {
+        var result = Currency.Format(100m, "USD", new FormatOptions(symbol: SymbolMode.Symbol));
+        Assert.Equal("$100.00", result);
+    }
+
+    [Fact]
+    public void SymbolMode_IsoCode_ReturnsCodeSuffix()
+    {
+        var result = Currency.Format(1234.56m, "USD", new FormatOptions(symbol: SymbolMode.IsoCode));
+        Assert.Equal("1,234.56 USD", result);
+    }
+
+    [Fact]
+    public void SymbolMode_None_ReturnsNumberOnly()
+    {
+        var result = Currency.Format(1234.56m, "USD", new FormatOptions(symbol: SymbolMode.None));
+        Assert.DoesNotContain("$", result);
+        Assert.DoesNotContain("USD", result);
+    }
+
+    [Fact]
+    public void SymbolMode_IsoCode_NegativeAmount()
+    {
+        var result = Currency.Format(-100m, "USD", new FormatOptions(symbol: SymbolMode.IsoCode));
+        Assert.Equal("-100.00 USD", result);
+    }
+}
+
+public class NegativePatternTests
+{
+    [Fact]
+    public void Parentheses_NegativeAmount_Symbol()
+    {
+        var result = Currency.Format(-100m, "USD",
+            new FormatOptions(negativePattern: NegativePattern.Parentheses));
+        Assert.Equal("($100.00)", result);
+    }
+
+    [Fact]
+    public void Parentheses_PositiveAmount_NoChange()
+    {
+        var result = Currency.Format(100m, "USD",
+            new FormatOptions(negativePattern: NegativePattern.Parentheses));
+        Assert.Equal("$100.00", result);
+    }
+
+    [Fact]
+    public void Parentheses_NegativeAmount_IsoCode()
+    {
+        var result = Currency.Format(-100m, "USD",
+            new FormatOptions(symbol: SymbolMode.IsoCode, negativePattern: NegativePattern.Parentheses));
+        Assert.Equal("(100.00 USD)", result);
+    }
+
+    [Fact]
+    public void Parentheses_NegativeAmount_None()
+    {
+        var result = Currency.Format(-100m, "USD",
+            new FormatOptions(symbol: SymbolMode.None, negativePattern: NegativePattern.Parentheses));
+        Assert.Equal("(100.00)", result);
+    }
+
+    [Fact]
+    public void Default_NegativeAmount_UsesMinus()
+    {
+        var result = Currency.Format(-100m, "USD", new FormatOptions());
+        Assert.Contains("-", result);
+        Assert.DoesNotContain("(", result);
+    }
+}
+
+public class BackwardCompatibilityTests
+{
+    [Fact]
+    public void IncludeSymbol_False_StillWorks()
+    {
+        var result = Currency.Format(100m, "USD", new FormatOptions(includeSymbol: false));
+        Assert.DoesNotContain("$", result);
+    }
+
+    [Fact]
+    public void IncludeSymbol_True_StillWorks()
+    {
+        var result = Currency.Format(100m, "USD", new FormatOptions(includeSymbol: true));
+        Assert.Contains("$", result);
+    }
 }
 
 public class CompactFormatTests

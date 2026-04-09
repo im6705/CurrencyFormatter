@@ -40,18 +40,43 @@ public static class Currency
         if (options == null) throw new ArgumentNullException(nameof(options));
 
         var info = Registry.GetCurrency(isoCode);
-        var rounded = Math.Round(amount, options.DecimalDigits ?? info.DecimalDigits, options.Rounding);
+        var digits = options.DecimalDigits ?? info.DecimalDigits;
+        var rounded = Math.Round(amount, digits, options.Rounding);
 
         var nfi = (NumberFormatInfo)info.NumberFormat.Clone();
-        if (options.DecimalDigits.HasValue)
-            nfi.CurrencyDecimalDigits = options.DecimalDigits.Value;
+        nfi.CurrencyDecimalDigits = digits;
         if (!options.UseGroupSeparator)
             nfi.CurrencyGroupSeparator = string.Empty;
 
-        if (!options.IncludeSymbol)
-            return rounded.ToString("N" + nfi.CurrencyDecimalDigits, nfi);
+        // 회계 스타일 괄호 음수 패턴
+        if (options.NegativePattern == Models.NegativePattern.Parentheses)
+            nfi.CurrencyNegativePattern = 0; // ($n)
 
-        return rounded.ToString("C", nfi);
+        string result;
+        switch (options.Symbol)
+        {
+            case Models.SymbolMode.IsoCode:
+                var num = Math.Abs(rounded).ToString("N" + digits, nfi);
+                var sign = rounded < 0
+                    ? (options.NegativePattern == Models.NegativePattern.Parentheses ? "" : "-")
+                    : "";
+                result = options.NegativePattern == Models.NegativePattern.Parentheses && rounded < 0
+                    ? $"({num} {isoCode.Trim().ToUpperInvariant()})"
+                    : $"{sign}{num} {isoCode.Trim().ToUpperInvariant()}";
+                break;
+
+            case Models.SymbolMode.None:
+                result = rounded.ToString("N" + digits, nfi);
+                if (options.NegativePattern == Models.NegativePattern.Parentheses && rounded < 0)
+                    result = $"({Math.Abs(rounded).ToString("N" + digits, nfi)})";
+                break;
+
+            default: // SymbolMode.Symbol
+                result = rounded.ToString("C", nfi);
+                break;
+        }
+
+        return result;
     }
 
     /// <summary>
