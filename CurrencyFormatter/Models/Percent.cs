@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json.Serialization;
+using CurrencyFormatter.Formatting;
 
 namespace CurrencyFormatter.Models;
 
@@ -6,11 +8,11 @@ namespace CurrencyFormatter.Models;
 /// 백분율을 표현하는 불변 값 타입.
 /// 8.5를 전달하면 내부적으로 0.085 비율로 저장합니다.
 /// </summary>
+[JsonConverter(typeof(PercentJsonConverter))]
 public readonly struct Percent : IEquatable<Percent>
 {
     /// <summary>정규화된 비율 (예: 8.5% → 0.085)</summary>
     public decimal Rate { get; }
-
     /// <summary>원래 백분율 값 (예: 8.5)</summary>
     public decimal Value { get; }
 

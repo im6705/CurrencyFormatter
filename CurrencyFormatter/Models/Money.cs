@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json.Serialization;
+using CurrencyFormatter.Formatting;
 
 namespace CurrencyFormatter.Models;
 
@@ -6,7 +8,8 @@ namespace CurrencyFormatter.Models;
 /// 금액과 통화 코드를 함께 표현하는 불변 값 타입.
 /// 통화가 다른 금액의 실수 연산을 타입 수준에서 방지합니다.
 /// </summary>
-public readonly struct Money : IEquatable<Money>, IComparable<Money>
+[JsonConverter(typeof(MoneyJsonConverter))]
+public readonly struct Money : IEquatable<Money>, IComparable<Money>, IFormattable
 {
     /// <summary>금액</summary>
     public decimal Amount { get; }
@@ -93,7 +96,38 @@ public readonly struct Money : IEquatable<Money>, IComparable<Money>
     }
 
     public override string ToString() => Format();
+
+    /// <summary>
+    /// 형식 문자열을 사용하여 포맷합니다.
+    /// G/C: 통화 형식 ($1,234.56), N: 숫자만 (1,234.56), K: 축약 ($1.2K)
+    /// </summary>
+    public string ToString(string? format, IFormatProvider? formatProvider = null)
+    {
+        if (string.IsNullOrEmpty(format) || format == "G" || format == "C")
+            return Format();
+        if (format == "N")
+            return Format(new FormatOptions(includeSymbol: false));
+        if (format == "K")
+            return CurrencyFormatter.FormatCompact(Amount, IsoCode);
+        return Format();
+    }
 #pragma warning restore CS1591
+
+    /// <summary>
+    /// 통화의 기본 소수점 자릿수로 반올림합니다. (예: USD → 2자리, JPY → 0자리)
+    /// </summary>
+    /// <param name="rounding">반올림 모드 (기본: Banker's rounding)</param>
+    public Money Round(MidpointRounding rounding = MidpointRounding.ToEven)
+    {
+        var info = CurrencyFormatter.GetInfo(IsoCode);
+        return new Money(Math.Round(Amount, info.DecimalDigits, rounding), IsoCode);
+    }
+
+    /// <summary>
+    /// 지정된 소수점 자릿수로 반올림합니다.
+    /// </summary>
+    public Money Round(int decimals, MidpointRounding rounding = MidpointRounding.ToEven)
+        => new Money(Math.Round(Amount, decimals, rounding), IsoCode);
 
     /// <summary>통화 문자열을 파싱하여 Money를 생성합니다.</summary>
     public static Money Parse(string input, string isoCode)

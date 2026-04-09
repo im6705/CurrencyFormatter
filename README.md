@@ -9,6 +9,10 @@ ISO 4217 currency formatting, parsing, and metadata library for .NET.
 - `CurrencyInfo` metadata: symbol, decimal digits, English/native names
 - `Money` value type with arithmetic operators and type-safe currency enforcement
 - `Percent` value type for intuitive percentage calculations (`price * 8.5m.Percent()`)
+- Compact formatting: `$1.2K`, `$3.5M`, `$2.0B`
+- `Money.Round()` for currency-aware rounding
+- `IFormattable` support: `$"{price:K}"` for compact, `$"{price:N}"` for number-only
+- Built-in JSON serialization (`System.Text.Json`)
 - `FormatOptions` for custom decimal digits, rounding, group separators
 - Extension methods: `decimal.FormatAsCurrency("USD")`
 - Custom `IFormatProvider` for `string.Format` integration
@@ -62,6 +66,27 @@ var total = price + tax;               // Money(108.5, "USD")
 
 // Money prevents cross-currency errors at compile/runtime
 // new Money(100, "USD") + new Money(100, "EUR")  → throws InvalidOperationException
+
+// Compact formatting
+CurrencyFormatter.FormatCompact(1500000m, "USD");     // "$1.5M"
+CurrencyFormatter.FormatCompact(2500m, "USD");        // "$2.5K"
+CurrencyFormatter.FormatCompact(3000000000m, "USD");  // "$3.0B"
+
+// IFormattable (format strings)
+var revenue = new Money(1500000m, "USD");
+$"{revenue:K}";  // "$1.5M"  (compact)
+$"{revenue:N}";  // "1,500,000.00" (number only)
+$"{revenue:C}";  // "$1,500,000.00" (currency, default)
+
+// Rounding (currency-aware)
+var calculated = new Money(10.555m, "USD");
+calculated.Round();                                  // $10.56 (USD → 2 decimals)
+new Money(100.7m, "JPY").Round();                    // ¥101 (JPY → 0 decimals)
+calculated.Round(MidpointRounding.AwayFromZero);     // $10.56
+
+// JSON serialization (System.Text.Json, built-in)
+var json = JsonSerializer.Serialize(price);   // {"amount":100,"currency":"USD"}
+var money = JsonSerializer.Deserialize<Money>(json);
 
 // Format options
 var options = new FormatOptions(

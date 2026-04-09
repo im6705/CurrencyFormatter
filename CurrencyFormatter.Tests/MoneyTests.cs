@@ -1,4 +1,6 @@
+using System.Text.Json;
 using CurrencyFormatter.Extensions;
+using CurrencyFormatter.Formatting;
 using CurrencyFormatter.Models;
 
 namespace CurrencyFormatter.Tests;
@@ -210,6 +212,194 @@ public class PercentTests
     public void Percent_ToString_ShowsPercent()
     {
         Assert.Equal("8.5%", new Percent(8.5m).ToString());
+    }
+}
+
+public class RoundTests
+{
+    [Fact]
+    public void Round_USD_RoundsTo2Decimals()
+    {
+        var money = new Money(10.555m, "USD");
+        var rounded = money.Round();
+        Assert.Equal(10.56m, rounded.Amount); // Banker's rounding
+        Assert.Equal("USD", rounded.IsoCode);
+    }
+
+    [Fact]
+    public void Round_JPY_RoundsTo0Decimals()
+    {
+        var money = new Money(100.7m, "JPY");
+        var rounded = money.Round();
+        Assert.Equal(101m, rounded.Amount);
+    }
+
+    [Fact]
+    public void Round_CustomDecimals_Works()
+    {
+        var money = new Money(10.5555m, "USD");
+        var rounded = money.Round(3);
+        Assert.Equal(10.556m, rounded.Amount);
+    }
+
+    [Fact]
+    public void Round_AwayFromZero_Works()
+    {
+        var money = new Money(10.555m, "USD");
+        var rounded = money.Round(MidpointRounding.AwayFromZero);
+        Assert.Equal(10.56m, rounded.Amount);
+    }
+}
+
+public class FormattableTests
+{
+    [Fact]
+    public void ToString_G_ReturnsCurrencyFormat()
+    {
+        var money = new Money(1234.56m, "USD");
+        Assert.Equal("$1,234.56", money.ToString("G"));
+    }
+
+    [Fact]
+    public void ToString_C_ReturnsCurrencyFormat()
+    {
+        var money = new Money(1234.56m, "USD");
+        Assert.Equal("$1,234.56", money.ToString("C"));
+    }
+
+    [Fact]
+    public void ToString_N_ReturnsNumberOnly()
+    {
+        var money = new Money(1234.56m, "USD");
+        var result = money.ToString("N");
+        Assert.DoesNotContain("$", result);
+    }
+
+    [Fact]
+    public void ToString_K_ReturnsCompactFormat()
+    {
+        var money = new Money(1500000m, "USD");
+        Assert.Equal("$1.5M", money.ToString("K"));
+    }
+
+    [Fact]
+    public void ToString_Null_ReturnsDefault()
+    {
+        var money = new Money(1234.56m, "USD");
+        Assert.Equal("$1,234.56", money.ToString(null, null));
+    }
+}
+
+public class CompactFormatTests
+{
+    [Fact]
+    public void FormatCompact_Thousands()
+    {
+        Assert.Equal("$1.2K", CurrencyFormatter.FormatCompact(1234m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_Millions()
+    {
+        Assert.Equal("$1.5M", CurrencyFormatter.FormatCompact(1500000m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_Billions()
+    {
+        Assert.Equal("$2.0B", CurrencyFormatter.FormatCompact(2000000000m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_Trillions()
+    {
+        Assert.Equal("$1.0T", CurrencyFormatter.FormatCompact(1000000000000m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_BelowThousand_ReturnsNormalFormat()
+    {
+        Assert.Equal("$999.00", CurrencyFormatter.FormatCompact(999m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_Negative()
+    {
+        Assert.Equal("$-1.5M", CurrencyFormatter.FormatCompact(-1500000m, "USD"));
+    }
+
+    [Fact]
+    public void FormatCompact_CustomDecimals()
+    {
+        Assert.Equal("$1.23M", CurrencyFormatter.FormatCompact(1234567m, "USD", 2));
+    }
+
+    [Fact]
+    public void FormatCompact_KRW()
+    {
+        Assert.Equal("₩1.5M", CurrencyFormatter.FormatCompact(1500000m, "KRW"));
+    }
+}
+
+public class JsonSerializationTests
+{
+    [Fact]
+    public void Money_Serialize_Works()
+    {
+        var money = new Money(1234.56m, "USD");
+        var json = JsonSerializer.Serialize(money);
+        Assert.Contains("\"amount\":1234.56", json);
+        Assert.Contains("\"currency\":\"USD\"", json);
+    }
+
+    [Fact]
+    public void Money_Deserialize_Works()
+    {
+        var json = "{\"amount\":1234.56,\"currency\":\"USD\"}";
+        var money = JsonSerializer.Deserialize<Money>(json);
+        Assert.Equal(1234.56m, money.Amount);
+        Assert.Equal("USD", money.IsoCode);
+    }
+
+    [Fact]
+    public void Money_RoundTrip_Works()
+    {
+        var original = new Money(99.99m, "EUR");
+        var json = JsonSerializer.Serialize(original);
+        var deserialized = JsonSerializer.Deserialize<Money>(json);
+        Assert.Equal(original, deserialized);
+    }
+
+    [Fact]
+    public void Percent_Serialize_Works()
+    {
+        var pct = new Percent(8.5m);
+        var json = JsonSerializer.Serialize(pct);
+        Assert.Contains("\"value\":8.5", json);
+    }
+
+    [Fact]
+    public void Percent_Deserialize_Works()
+    {
+        var json = "{\"value\":8.5}";
+        var pct = JsonSerializer.Deserialize<Percent>(json);
+        Assert.Equal(8.5m, pct.Value);
+        Assert.Equal(0.085m, pct.Rate);
+    }
+
+    [Fact]
+    public void Percent_DeserializeFromNumber_Works()
+    {
+        var json = "8.5";
+        var pct = JsonSerializer.Deserialize<Percent>(json);
+        Assert.Equal(8.5m, pct.Value);
+    }
+
+    [Fact]
+    public void Money_Deserialize_MissingCurrency_Throws()
+    {
+        var json = "{\"amount\":100}";
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<Money>(json));
     }
 }
 

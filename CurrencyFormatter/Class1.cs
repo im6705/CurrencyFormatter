@@ -134,4 +134,42 @@ public static class CurrencyFormatter
     /// 지원되는 모든 통화 정보를 반환합니다.
     /// </summary>
     public static IEnumerable<CurrencyInfo> SupportedCurrencies => Registry.SupportedCurrencies;
+
+    /// <summary>
+    /// 금액을 축약 형식으로 포맷합니다. (예: 1234 → "$1.2K", 1500000 → "$1.5M")
+    /// </summary>
+    /// <param name="amount">포맷할 금액</param>
+    /// <param name="isoCode">ISO 4217 통화 코드</param>
+    /// <param name="decimals">소수점 자릿수 (기본: 1)</param>
+    /// <returns>축약 형식 문자열</returns>
+    public static string FormatCompact(decimal amount, string isoCode, int decimals = 1)
+    {
+        var info = Registry.GetCurrency(isoCode);
+        var abs = Math.Abs(amount);
+        var sign = amount < 0 ? "-" : "";
+        var fmt = $"F{decimals}";
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+
+        string scaled;
+        if (abs >= 1_000_000_000_000m)
+            scaled = $"{sign}{(abs / 1_000_000_000_000m).ToString(fmt, inv)}{CompactSuffix.Trillion}";
+        else if (abs >= 1_000_000_000m)
+            scaled = $"{sign}{(abs / 1_000_000_000m).ToString(fmt, inv)}{CompactSuffix.Billion}";
+        else if (abs >= 1_000_000m)
+            scaled = $"{sign}{(abs / 1_000_000m).ToString(fmt, inv)}{CompactSuffix.Million}";
+        else if (abs >= 1_000m)
+            scaled = $"{sign}{(abs / 1_000m).ToString(fmt, inv)}{CompactSuffix.Thousand}";
+        else
+            return Format(amount, isoCode);
+
+        return $"{info.Symbol}{scaled}";
+    }
+
+    private static class CompactSuffix
+    {
+        public const string Thousand = "K";
+        public const string Million = "M";
+        public const string Billion = "B";
+        public const string Trillion = "T";
+    }
 }
